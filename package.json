@@ -1,0 +1,40 @@
+{
+  "name": "flipp-mcp",
+  "version": "0.1.0",
+  "description": "Unofficial MCP server for Flipp flyers/deals (backflipp + flyers-ng backends)",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashwnn/flipp-mcp"
+  },
+  "bin": {
+    "flipp-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "node scripts/inline-skills.mjs && tsc",
+    "pretest": "node scripts/inline-skills.mjs",
+    "pretypecheck": "node scripts/inline-skills.mjs",
+    "dev": "tsx src/index.ts",
+    "dev:worker": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "eslint": "^9.12.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "wrangler": "^4.158.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
