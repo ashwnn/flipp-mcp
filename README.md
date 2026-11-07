@@ -55,6 +55,23 @@ npm run deploy      # -> https://flipp-mcp.<your-subdomain>.workers.dev/mcp
 
 Point any Streamable-HTTP MCP client at `https://<your-worker>.workers.dev/mcp`.
 
+## Auth (single password via OAuth 2.1)
+
+The Worker is a spec-compliant OAuth 2.1 resource server. Set one password as a secret — it's entered once on the `/authorize` page, the client gets tokens via DCR + PKCE, no other infrastructure needed:
+
+```bash
+wrangler secret put FLIPP_MCP_PASSWORD   # type a long random value
+```
+
+Local dev: `echo 'FLIPP_MCP_PASSWORD=dev-password' > .dev.vars` (gitignored) then `npm run dev:worker`.
+
+- No password set → `/mcp` returns `401` (fail-closed). stdio is unaffected (local process, no auth).
+- Claude: add custom connector → sign in (OAuth + PKCE + DCR are automatic), or "No sign-in" with a Request header carrying an access token minted via the flow below.
+- ChatGPT: add custom MCP server → OAuth sign-in (DCR is automatic). ChatGPT requires OAuth — a static bearer value alone won't connect it.
+- Claude Code / API clients: `--header "Authorization: Bearer <oauth-access-token>"` after completing the code flow once, or paste the password-derived login via `/mcp` auth.
+
+Endpoints: `/.well-known/oauth-protected-resource`, `/.well-known/oauth-authorization-server`, `/register`, `/authorize`, `/token`. Tokens are stateless HMAC-signed (5-min codes, 1-h access, 30-d refresh) — rotating the password re-keys everything.
+
 ## Skill
 
 `skills/flipp-deals/SKILL.md` teaches agents the workflow: ask for a postal code, search then drill down, always quote flyer expiry dates. Served live over the Skills extension (`skills/list` + `skills/get` on `skill://flipp-deals/SKILL.md`); ChatGPT can also import it at plugin submission, or copy `skills/flipp-deals/` into your agent's skills folder.
